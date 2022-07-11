@@ -94,31 +94,33 @@ let clickNextSubs = async (page) => {
     return current;
 }
 
+let clickPaginations = async (page) => {
+    let subscribers = {};
+    let hasNext = false;
+    let prevPage = -1;
+    const readSubscribers = createSubscribers();
+    do {
+        subscribers = await readSubscribers(page);
+        let currPage = await clickNextSubs(page);
+        if (!currPage || prevPage === currPage) hasNext = false;
+        else hasNext = true;
+        prevPage = currPage;
+    } while (hasNext);
+    return subscribers;
+}
+
 let scrape = async ({ url }) => {
     let subscribers = {};
+    const browser = await puppeteer.launch({ headless: true });
     try {
-        const browser = await puppeteer.launch({ headless: false });
         const page = await browser.newPage();
-
         await page.goto(url, { timeout: 0, waitUntil: 'networkidle0' });
-        if (!page) throw Error('No page');
 
         const tab = await page.$('[data-id=pet-tab-3]');
         if (tab === null) throw Error('No tab');
         await tab.click();
 
-        let hasNext = false;
-        let prevPage = -1;
-        const readSubscribers = createSubscribers();
-        do {
-            subscribers = await readSubscribers(page);
-            let currPage = await clickNextSubs(page);
-            if (!currPage || prevPage === currPage) hasNext = false;
-            else hasNext = true;
-            prevPage = currPage;
-        } while (hasNext);
-    } catch (e) {
-        throw e;
+        subscribers = await clickPaginations(page);
     } finally {
         browser.close();
     }
@@ -129,7 +131,7 @@ let scrape = async ({ url }) => {
 app.post('/', jsonParser, function (req, res) {
     scrape(req.body)
         .then((value) => res.json(value))
-        .catch(e => res.status(404).json({ error: e.message }));
+        .catch(e => res.status(404).json({ error: e }));
 });
 
 app.get('/', function (req, res) {

@@ -34,13 +34,12 @@
                         <span
                             class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
                             http:// </span>
-                        <input type="text" name="website" id="website"
-                            class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                            placeholder="www.example.com">
+                        <input type="text" name="website" id="website" class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full
+                            rounded-none rounded-r-md sm:text-sm border-gray-300" placeholder="www.example.com">
                     </div>
                 </div>
             </form>
-            <div id="content"></div>
+            <div id="content" class="mx-auto"></div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -61,12 +60,16 @@
             const config = {
                 type: 'line',
                 data: data,
-                options: {}
+                options: {
+                    responsive: true
+                }
             };
             const myChart = new Chart(
                 document.getElementById('myChart'),
                 config
             );
+            myChart.canvas.parentNode.style.height = 'calc(100vh - 120px)';
+            myChart.canvas.parentNode.style.width = 'calc(100vh - 120px)';
         }
 
         const form = document.querySelector('form');
@@ -87,6 +90,8 @@
                 Processing...
             </div>
             `;
+            urlInput.classList.add('focus:border-blue-500', 'cursor-not-allowed', 'bg-gray-100');
+            urlInput.setAttribute('disabled', true);
             fetch('/', {
                     method: 'POST',
                     body: JSON.stringify({
@@ -100,6 +105,7 @@
                     if (response.ok) {
                         return response.json();
                     }
+                    throw new Error('Wrong page');
                 })
                 .then(json => {
                     content.innerHTML = `<canvas id="myChart" width="400" height="400"></canvas>`;
@@ -108,6 +114,11 @@
                 .catch(e => {
                     content.innerHTML = `<div
                     class="text-white mx-auto my-5 p-3 flex align-center justify-center">${e.message}</div>`;
+                })
+                .finally(() => {
+                    urlInput.classList.remove('focus:border-blue-500', 'cursor-not-allowed',
+                        'bg-gray-100');
+                    urlInput.removeAttribute('disabled');
                 });
             urlInput.value = '';
         });
