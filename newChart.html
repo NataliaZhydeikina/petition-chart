@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кількість людей, що підписувала петицію за легалізацію одностатевих шлюбів по дням</title>
+</head>
+
+<body>
+    <canvas id="myChart" width="400" height="400"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const labels = [
+            '10 липня 2022', '09 липня 2022', '08 липня 2022', '07 липня 2022', '06 липня 2022', '05 липня 2022',
+            '04 липня 2022', '03 липня 2022', '02 липня 2022', '01 липня 2022', '30 червня 2022', '29 червня 2022',
+            '28 червня 2022', '27 червня 2022', '26 червня 2022', '25 червня 2022', '24 червня 2022',
+            '23 червня 2022', '22 червня 2022', '21 червня 2022', '20 червня 2022', '19 червня 2022',
+            '18 червня 2022', '17 червня 2022', '16 червня 2022', '15 червня 2022', '14 червня 2022',
+            '13 червня 2022', '12 червня 2022', '11 червня 2022', '10 червня 2022', '09 червня 2022',
+            '08 червня 2022'
+        ];
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'My First dataset',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: ['333', '920', '849', '602', '1340', '205', '385', '287', '205', '235', '203', '89',
+                    '146', '109', '85', '75', '85', '84', '109', '53', '48', '66', '79', '81', '41',
+                    '32', '44', '67', '67', '117', '218', '805', '469'
+                ],
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+            options: {}
+        };
+    </script>
+    <script>
+        const myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+    </script>
+</body>
+
+</html>

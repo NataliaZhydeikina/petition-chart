@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кількість людей, що підписувала петицію</title>
+    <link href="https://unpkg.com/@tailwindcss/forms@0.2.1/dist/forms.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        pinkred: 'rgb(255, 99, 132)',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div class="grid md:grid-cols-6 gap-6 bg-gray-800 min-h-screen p-5 h-full">
+        <div class="md:col-start-2 md:col-end-6 w-full">
+            <form action="#" method="POST">
+                <div
+                    class="px-8 py-4 bg-white space-y-6 rounded flex justify-center items-center flex-col md:flex-row space-y-0">
+                    <label for="website" class="block text-sm font-medium text-gray-700 pr-4">
+                        Website
+                    </label>
+                    <div class="flex rounded w-full">
+                        <span
+                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            http:// </span>
+                        <input type="text" name="website" id="website"
+                            class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
+                            placeholder="www.example.com">
+                    </div>
+                </div>
+            </form>
+            <div id="content"></div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let createHTML = (subs) => {
+            const labels = Object.keys(subs);
+
+            const data = {
+                labels: labels,
+                datasets: [{
+                    label: 'petition changes',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    data: Object.values(subs).map(v => parseInt(v))
+                }]
+            };
+
+            const config = {
+                type: 'line',
+                data: data,
+                options: {}
+            };
+            const myChart = new Chart(
+                document.getElementById('myChart'),
+                config
+            );
+        }
+
+        const form = document.querySelector('form');
+        const urlInput = form.querySelector('#website');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            let content = document.getElementById('content');
+            content.innerHTML = `
+            <div class="rounded bg-pinkred text-white mx-auto my-5 p-3 flex align-center justify-center w-36">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none"
+                    viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+                    </circle>
+                    <path class="opacity-75" fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                    </path>
+                </svg>
+                Processing...
+            </div>
+            `;
+            fetch('/', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        url: urlInput.value
+                    }),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                })
+                .then(json => {
+                    content.innerHTML = `<canvas id="myChart" width="400" height="400"></canvas>`;
+                    createHTML(json);
+                })
+                .catch(e => {
+                    content.innerHTML = `<div
+                    class="text-white mx-auto my-5 p-3 flex align-center justify-center">${e.message}</div>`;
+                });
+            urlInput.value = '';
+        });
+    </script>
+</body>
+
+</html>
